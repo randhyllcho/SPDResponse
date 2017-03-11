@@ -24,15 +24,15 @@ ggmap(seaMap) +
 
 gatherings <- responses %>% filter(Event.Clearance.Group == "PUBLIC GATHERINGS") 
 gatherings <- gatherings %>% separate(At.Scene.Time, c("Year", "Month", "Day", "Hour", "minute", "Second"))
-dat <- gatherings %>% filter(Event.Clearance.Description == "DEMONSTRATION MANAGEMENT (Control tactics used)") %>% group_by(Year) 
+data <- gatherings %>% filter(Event.Clearance.Description == "DEMONSTRATION MANAGEMENT (Control tactics used)") %>% group_by(Year) 
 ggplot(gatherings, aes(Longitude, Latitude, col = Year)) +
   geom_point()
 
 seattle <- geocode("seattle")
 
-seaMap <- get_map(seattle, zoom = 10)
+seaMap <- get_map(seattle, zoom = 11)
 ggmap(seaMap) +
-  geom_density2d(data = gatherings, aes(Longitude, Latitude, col = Year), size = 2, alpha = 0.7)
+  geom_point(data = gatherings, aes(Longitude, Latitude, col = Year), size = 2, alpha = 0.7)
 
 ggplot(responses %>% filter(Initial.Type.Subgroup == "MOTOR VEHICLE COLLISION INVESTIGATION", At.Scene.Time <= "2016-12-31"), aes(Longitude, Latitude)) +
   geom_point(alpha = 0.1, col = "#331A00") +
