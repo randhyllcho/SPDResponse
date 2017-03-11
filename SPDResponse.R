@@ -2,6 +2,7 @@ library(tidyverse)
 library(lubridate)
 library(ggmap)
 library(ggthemes)
+library(RColorBrewer)
 
 responses <- read.csv("spdResponse.csv", header = TRUE, stringsAsFactors = F)
 str(responses)
@@ -52,19 +53,31 @@ head(dat[,2])
 dat$DayOfWeek <- wday(dat[,2], label = TRUE)
 dat$Month <- month(dat[,2], label = TRUE)
 dat$ToD <- hour(dat[,2])
+str(dat)
 
-ggplot(dat, aes(DayOfWeek, fill = ToD)) +
+colorCount <- length(unique(dat$ToD))
+bigPalette <- colorRampPalette(brewer.pal(9, "Spectral"))
+myPal <- bigPalette(colorCount)
+
+ggplot(dat, aes(DayOfWeek, fill = as.factor(ToD))) +
   geom_bar(stat = "count") +
   facet_wrap(~Month, ncol = 4) +
-  scale_fill_brewer(type = "seq", palette = "Blues") +
+  scale_fill_manual(values = myPal, name = "Time Of Day") +
   theme_few() +
-  theme(axis.text.x = element_text(size = 6))
+  theme(axis.text.x = element_text(size = 6),
+        legend.position = "right",
+        legend.direction = "vertical",
+        axis.title.x = element_text(hjust = 0, size = 15),
+        text = element_text(family = "mono"),
+        title = element_text(size = 20),
+        legend.title = element_text(size = 12)) +
+  labs(x = "Crashes by Day and Hour", y = "", title = "Car crash distribution in Seattle 2016")
 
 ggplot(dat, aes(ToD, fill = DayOfWeek)) +
   geom_bar(stat = "count") +
   facet_wrap(~Month, ncol = 4) +
   labs(x = "Time Of Day", y = "") +
   scale_x_continuous(breaks = seq(0,24,by=1)) +
-  scale_fill_brewer(type = "seq", palette = "Blues") +
+  scale_fill_brewer(type = "seq", palette = "YlGnBu") +
   theme_few() +
   theme(axis.text.x = element_text(size = 6))
