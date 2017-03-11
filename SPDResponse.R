@@ -1,6 +1,7 @@
 library(tidyverse)
 library(lubridate)
 library(ggmap)
+library(ggthemes)
 
 responses <- read.csv("spdResponse.csv", header = TRUE, stringsAsFactors = F)
 str(responses)
@@ -46,4 +47,24 @@ ggplot(responses %>% filter(Initial.Type.Subgroup == "MOTOR VEHICLE COLLISION IN
         strip.text = element_blank()) 
 
 
+dat <- responses %>% select(Initial.Type.Subgroup, At.Scene.Time) %>% filter(Initial.Type.Subgroup == "MOTOR VEHICLE COLLISION INVESTIGATION")
+head(dat[,2])
+dat$DayOfWeek <- wday(dat[,2], label = TRUE)
+dat$Month <- month(dat[,2], label = TRUE)
+dat$ToD <- hour(dat[,2])
 
+ggplot(dat, aes(DayOfWeek, fill = ToD)) +
+  geom_bar(stat = "count") +
+  facet_wrap(~Month, ncol = 4) +
+  scale_fill_brewer(type = "seq", palette = "Blues") +
+  theme_few() +
+  theme(axis.text.x = element_text(size = 6))
+
+ggplot(dat, aes(ToD, fill = DayOfWeek)) +
+  geom_bar(stat = "count") +
+  facet_wrap(~Month, ncol = 4) +
+  labs(x = "Time Of Day", y = "") +
+  scale_x_continuous(breaks = seq(0,24,by=1)) +
+  scale_fill_brewer(type = "seq", palette = "Blues") +
+  theme_few() +
+  theme(axis.text.x = element_text(size = 6))
